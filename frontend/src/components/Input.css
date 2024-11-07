@@ -1,0 +1,63 @@
+.input-container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.card {
+    border-radius: 8px;
+    border: none;
+}
+
+.card-title {
+    font-weight: 500;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+button {
+    border-radius: 5px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+h4, h5, h6 {
+    font-weight: 600;
+}
+
+table {
+    text-align: center;
+}
+
+table th, table td {
+    vertical-align: middle;
+}
+/* Input.css */
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5em; /* Add space between rows */
+}
+
+.table th, .table td {
+    padding: 12px 20px; /* Increase padding for more space */
+    text-align: center;
+}
+
+.pass-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Add space between tables */
+    justify-content: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+*{
+    margin: 10px;
+}
