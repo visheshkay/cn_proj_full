@@ -13,7 +13,6 @@ function Input() {
     const [adjacencyMatrix, setAdjacencyMatrix] = useState([]);
 
     useEffect(() => {
-        // Initialize an empty adjacency matrix when numRouters is set
         if (numRouters) {
             const matrix = Array.from({ length: parseInt(numRouters) }, () => Array(parseInt(numRouters)).fill(0));
             setAdjacencyMatrix(matrix);
@@ -33,11 +32,10 @@ function Input() {
         try {
             const response = await axios.post(`${BACKEND_URL}/add_link`, { links });
             console.log(response.data.message);
-            // Update adjacency matrix based on links
             const matrix = Array.from({ length: parseInt(numRouters) }, () => Array(parseInt(numRouters)).fill(0));
             links.forEach(({ u, v, distance }) => {
                 matrix[u][v] = distance;
-                matrix[v][u] = distance; // assuming undirected graph
+                matrix[v][u] = distance;
             });
             setAdjacencyMatrix(matrix);
         } catch (error) {
@@ -93,33 +91,49 @@ function Input() {
                 </div>
 
                 <h3>Links</h3>
-                {links.map((link, index) => (
-                    <div key={index} className="form-row mb-2">
-                        <input
-                            type="number"
-                            className="form-control col mr-2"
-                            placeholder="u"
-                            value={link.u}
-                            onChange={(e) => handleLinkChange(index, 'u', e.target.value)}
-                        />
-                        <input
-                            type="number"
-                            className="form-control col mr-2"
-                            placeholder="v"
-                            value={link.v}
-                            onChange={(e) => handleLinkChange(index, 'v', e.target.value)}
-                        />
-                        <input
-                            type="number"
-                            className="form-control col"
-                            placeholder="Distance"
-                            value={link.distance}
-                            onChange={(e) => handleLinkChange(index, 'distance', e.target.value)}
-                        />
-                    </div>
-                ))}
-                <button className="btn btn-secondary" onClick={handleAddLink}>Add Link</button>
-                <button className="btn btn-primary mt-2" onClick={addLinks}>Submit Links</button>
+                <div className="links-table-container">
+                    <table className="links-table">
+                        <thead>
+                            <tr>
+                                <th>Link 1</th>
+                                <th>Link 2</th>
+                                <th>Distance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {links.map((link, index) => (
+                                <tr key={index}>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            placeholder="u"
+                                            value={link.u}
+                                            onChange={(e) => handleLinkChange(index, 'u', e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            placeholder="v"
+                                            value={link.v}
+                                            onChange={(e) => handleLinkChange(index, 'v', e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            placeholder="Distance"
+                                            value={link.distance}
+                                            onChange={(e) => handleLinkChange(index, 'distance', e.target.value)}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <button className="btn btn-secondary mt-2" onClick={handleAddLink}>Add Link</button>
+                <button className="btn btn-primary mt-2 ml-2" onClick={addLinks}>Submit Links</button>
             </div>
 
             <h3 className="mt-4">Graph Visualization</h3>
@@ -131,77 +145,70 @@ function Input() {
 
             {initialTable && (
                 <div className="mt-3">
-                    <h4>Initial Routing Table</h4>
-                    <div className="pass-grid">
-    {initialTable[0]?.routing_table.map((router, routerIndex) => (
-        <div key={routerIndex} className="router-table m-4">
-            <h6>Router {routerIndex}</h6>
-            <table className="table table-bordered m-4 p-4">
-                <thead>
-                    <tr>
-                        <th>Destination</th>
-                        <th>Next Hop</th>
-                        <th>Distance</th> {/* New Distance Column */}
-                    </tr>
-                </thead>
-                <tbody>
-                    {router.map((distance, destIndex) => (
-                        <tr key={destIndex}>
-                            <td>{destIndex}</td>
-                            <td>
-                                {initialTable[0].next_hop[routerIndex][destIndex] ?? 'N/A'}
-                            </td>
-                            <td>{distance ?? '∞'}</td> {/* Display distance directly from routing_table */}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    ))}
-</div>
-
+                    <h4 className="text-center">Initial Routing Table</h4>
+                    <div className="routing-table-container">
+                        {initialTable[0]?.routing_table.map((router, routerIndex) => (
+                            <div key={routerIndex} className="routing-table">
+                                <h6>Router {routerIndex}</h6>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Destination</th>
+                                            <th>Next Hop</th>
+                                            <th>Distance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {router.map((distance, destIndex) => (
+                                            <tr key={destIndex}>
+                                                <td>{destIndex}</td>
+                                                <td>{initialTable[0].next_hop[routerIndex][destIndex] ?? 'N/A'}</td>
+                                                <td>{distance ?? '∞'}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 
             {routingTable && (
                 <div className="mt-3">
-                    <h4>Routing Table (Pass-wise)</h4>
+                    <h4 className="text-center">Routing Table (Pass-wise)</h4>
                     {routingTable.map((passData, passIndex) => (
-            <div key={passIndex} className="mt-4">
-                <h5>Pass {passData.pass_num}</h5>
-                <div className="pass-grid">
-                    {passData.routing_table.map((router, routerIndex) => (
-                        <div key={routerIndex} className="router-table m-4">
-                            <h6>Router {routerIndex}</h6>
-                            <table className="table table-bordered m-4 p-4">
-                                <thead>
-                                    <tr>
-                                        {/* <th>Start</th> */}
-                                        <th>Destination</th>
-                                        <th>Next Hop</th>
-                                        <th>Distance</th> {/* New Distance Column */}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {router.map((distance, destIndex) => (
-                                        <tr key={destIndex}>
-                                            {/* <td>{routerIndex}</td> */}
-                                            <td>{destIndex}</td>
-                                            <td>{passData.next_hop[routerIndex][destIndex] ?? 'N/A'}</td>
-                                            <td>{distance ?? '∞'}</td> {/* Display distance directly from routing_table */}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                        <div key={passIndex} className="mt-4">
+                            <h5 className="text-center">Pass {passData.pass_num}</h5>
+                            <div className="routing-table-container">
+                                {passData.routing_table.map((router, routerIndex) => (
+                                    <div key={routerIndex} className="routing-table">
+                                        <h6>Router {routerIndex}</h6>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Destination</th>
+                                                    <th>Next Hop</th>
+                                                    <th>Distance</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {router.map((distance, destIndex) => (
+                                                    <tr key={destIndex}>
+                                                        <td>{destIndex}</td>
+                                                        <td>{passData.next_hop[routerIndex][destIndex] ?? 'N/A'}</td>
+                                                        <td>{distance ?? '∞'}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
-            </div>
-        ))}
-                </div>
             )}
-
-            
         </div>
     );
 }

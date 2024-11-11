@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Network } from 'vis-network';
+import './GrapghVisualizer.css';
 
 const GraphVisualizer = ({ adjacencyMatrix }) => {
   const containerRef = useRef(null);
@@ -13,7 +14,7 @@ const GraphVisualizer = ({ adjacencyMatrix }) => {
     const n = adjacencyMatrix.length;
 
     for (let i = 0; i < n; i++) {
-      nodes.push({ id: i, label: `Router ${i + 1}` }); // Corrected label syntax
+      nodes.push({ id: i, label: `Router ${i + 1}` });
       for (let j = i + 1; j < n; j++) {
         if (adjacencyMatrix[i][j] !== 0) {
           edges.push({
@@ -50,6 +51,13 @@ const GraphVisualizer = ({ adjacencyMatrix }) => {
       },
       physics: {
         enabled: true,
+        stabilization: { iterations: 200 }, // Stabilize the layout
+      },
+      interaction: {
+        zoomView: false, // Disable zoom on scroll
+      },
+      manipulation: {
+        enabled: false,
       },
     };
 
@@ -60,9 +68,9 @@ const GraphVisualizer = ({ adjacencyMatrix }) => {
     return () => {
       network.destroy();
     };
-  }, [adjacencyMatrix]); // Ensure the graph updates when adjacencyMatrix changes
+  }, [adjacencyMatrix]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '600px' }} />;
+  return <div ref={containerRef} className="graph-container" />;
 };
 
 export default GraphVisualizer;
